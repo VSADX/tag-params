@@ -110,10 +110,36 @@ self.tagParams = (function (exports) {
       return args.concat(rest(object || fallback));
     };
   };
+  /**
+   * Create a template result
+   * @param {function} contentfn a function that has multiline comments to string.
+   * @param {function} [transform] the optional function to modify string values
+   * @param {function} [othereval] the optional function to eval the values
+   * @returns {ParseResult} a function that accepts an optional object to generate
+   *                    new content, through the same template, each time.
+   */
+  
+  var multiline = function multiline(contentfn, transform, othereval) {
+    var content = contentfn.toString().
+        replace(/^[^\/]+\/\*!?/, '').
+        replace(/\*\/[^\/]+$/, '');
+    var _parse = parse(content, transform),
+        template = _parse.template,
+        values = _parse.values;
+
+    var exec = othereval || contentfn;
+    values = exec("[" + values + "]");
+
+    return {
+      template: tempalte, 
+      values: values
+    }
+  };
 
   exports.params = params;
   exports.parse = parse;
   exports.partial = partial;
+  exports.multiline = multiline;
 
   return exports;
 
